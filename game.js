@@ -1,5 +1,7 @@
 import kaboom from "./kaboom.mjs";
 import loader from "./loader.js";
+import spawnBullet from "./spawnBullet.js";
+import spawnEnemy from "./spawnEnemy.js";
 
 const boomOpts = {
   width: 720,
@@ -18,18 +20,26 @@ const Game = {
   chars:{
     "mark":
     {
-      attributes: {health: 3, atk: 1, speed: 5}
+      attributes: {health: 3, atk: 1, speed: 'NORMAL', special: 'NONE'},
+      bullet: 0,
+      vel: 200,
     },
     "blue":
     {
-      attributes: {health: 5, atk: 1, speed: 5}
+      attributes: {health: 5, atk: 1, speed: 'NORMAL', special: 'NONE'},
+      bullet: 1,
+      vel: 200,
     },
     "angry":
     {
-      attributes: {health: 3, atk: 2, speed: 2}
+      attributes: {health: 3, atk: 2, speed: 'SLOW', special: 'TWO BULLETS'},
+      bullet: 2,
+      vel: 125,
     },
     "cyborg": {
-      attributes: {health: 5, atk: 3, speed: 1}
+      attributes: {health: 5, atk: 3, speed: 'SLUGGISH', special: 'NONE'},
+      bullet: 3,
+      vel: 100,
     }
   }
 }
@@ -120,7 +130,10 @@ scene('choose', () => {
     origin('center'),
   ])
   let a = add([
-    text(` [HEALTH: ${Game.chars[s[m.char]].attributes.health}].green\n [ATTACK: ${Game.chars[s[m.char]].attributes.atk}].red\n [SPEED: ${Game.chars[s[m.char]].attributes.speed}].blue`,
+    text(`[HEALTH: ${Game.chars[s[m.char]].attributes.health}].green
+[ATTACK: ${Game.chars[s[m.char]].attributes.atk}].red
+          [SPEED: ${Game.chars[s[m.char]].attributes.speed}].blue
+          [SPECIAL: ${Game.chars[s[m.char]].attributes.special}].yellow`,
           {
             size: 20, width: width() - 50, 
             letterSpacing: -6,
@@ -128,6 +141,7 @@ scene('choose', () => {
               "green": { color: rgb(147, 250, 113)},
               "red": { color: rgb(255, 32, 90)},
               "blue": { color: rgb(53, 160, 255)},
+              "yellow": { color: rgb(255, 214, 66)},
             }
           }),
     pos(width()/2, height()/1.2),
@@ -136,7 +150,10 @@ scene('choose', () => {
   onUpdate(() => {
     i.text = INFO[m.char].toUpperCase();
     n.text = NAMES[m.char];
-    a.text = `[HEALTH: ${Game.chars[s[m.char]].attributes.health}].green\n [ATTACK: ${Game.chars[s[m.char]].attributes.atk}].red\n [SPEED: ${Game.chars[s[m.char]].attributes.speed}].blue`
+    a.text = `[HEALTH: ${Game.chars[s[m.char]].attributes.health}].green
+    [ATTACK: ${Game.chars[s[m.char]].attributes.atk}].red
+    [SPEED: ${Game.chars[s[m.char]].attributes.speed}].blue
+    [SPECIAL: ${Game.chars[s[m.char]].attributes.special}].yellow`
   })
 
   let p = add([
@@ -151,26 +168,113 @@ scene('choose', () => {
     pos(width() - 50, height() - 50),
     origin('center'),
     area(),
-    color(96, 250, 113)
+    color(96, 250, 113),
   ])
 
   p.onClick(() => {
     go('play', s[m.char])
   })
+  onKeyPress('enter', () => {
+    go('play', s[m.char])
+  })
 })
 
 scene('play', (m) => {
+  const s = m.toLowerCase();
+  const SPEED = Game.chars[s].vel;
   onKeyPress('f', () => {
     fullscreen(!isFullscreen())
   })
-  const s = m.toLowerCase();
   let mark = add([
     sprite('marks', {anim: `${s}Idle`}),
     pos(50, height()/2),
     scale(2),
-    area(),
-    origin('center')
+    area({scale: 0.8}),
+    health(Game.chars[s].attributes.health),
+    origin('center'),
+    {
+      up: false,
+      down: false,
+      w: false,
+      s: false,
+    }
   ])
+
+  onKeyDown('up', () => {
+    if(isKeyDown('w')){
+      mark.move(0, -SPEED)
+    }else {
+      mark.move(0, -SPEED)
+    }
+  })
+  onKeyDown('w', () => {
+    if(isKeyDown('up')){
+      mark.move(0, -SPEED)
+    }else {
+      mark.move(0, -SPEED)
+    }
+  })
+  onKeyDown('down', () => {
+    if(isKeyDown('s')){
+      mark.move(0, SPEED)
+    }else {
+      mark.move(0, SPEED)
+    }
+  })
+  onKeyDown('s', () => {
+    if(isKeyDown('down')){
+      mark.move(0, SPEED)
+    }else {
+      mark.move(0, SPEED)
+    }
+  })
+  // onKeyDown('up')
+
+  loop(0.4, () => {
+    if(mark.exists()){
+      spawnBullet(mark.pos, Game.chars[s].bullet, 'player', Game.chars[s].attributes.special)
+    }
+  })
+
+  onCollide('enemy', 'bullet', (e, b) => {
+    b.destroy();
+    e.hurt(Game.chars[s].attributes.atk);
+  })
+  mark.onCollide('dangerous', (d) => {
+    d.destroy();
+    mark.hurt(1);
+  })
+  mark.onDeath(() => {
+    addKaboom(mark.pos);
+    mark.destroy();
+  })
+  on('death', 'enemy', (e) => {
+    addKaboom(e.pos);
+    e.destroy();
+  })
+
+  let eTimer = 0
+  onUpdate('enemy', (e) => {
+    let speedY = 0;
+    eTimer += dt();
+    if(e.is('wavy')){
+      speedY = wave(-100, 100, time() * 1.5)
+    }
+    if(eTimer >= 4){
+      wait(0.0000001, () => eTimer = 0)
+      spawnBullet(e.pos, 'hi', 'enemy', 'none')
+    }
+    e.move(-100, speedY)
+  })
+
+  let t = 0;
+  onUpdate(() => {
+    t += dt();
+    if(t >= 2){
+      spawnEnemy();
+      wait(0.001, () => t = 0)
+    }
+  })
 })
 
 go('main')
