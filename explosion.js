@@ -1,4 +1,0 @@
-f
-}
-
-export default explosion;
