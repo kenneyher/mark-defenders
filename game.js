@@ -2,6 +2,7 @@ import kaboom from "./kaboom.mjs";
 import loader from "./loader.js";
 import spawnBullet from "./spawnBullet.js";
 import spawnEnemy from "./spawnEnemy.js";
+import floating from "./floating.js";
 
 const boomOpts = {
   width: 720,
@@ -17,6 +18,8 @@ kaboom(boomOpts);
 loader();
 
 const Game = {
+  layers: ['bg', 'game', 'fx', 'ui'],
+  highscore: 0,
   chars:{
     "mark":
     {
@@ -32,12 +35,12 @@ const Game = {
     },
     "angry":
     {
-      attributes: {health: 3, atk: 2, speed: 'SLOW', special: 'TWO BULLETS'},
+      attributes: {health: 2, atk: 2, speed: 'SLOW', special: 'TWO BULLETS'},
       bullet: 2,
       vel: 125,
     },
     "cyborg": {
-      attributes: {health: 5, atk: 3, speed: 'SLUGGISH', special: 'NONE'},
+      attributes: {health: 2, atk: 3, speed: 'SLUGGISH', special: 'NONE'},
       bullet: 3,
       vel: 100,
     }
@@ -45,6 +48,7 @@ const Game = {
 }
 
 scene('main', () => {
+  layers(Game.layers);
   onKeyPress('f', () => {
     fullscreen(!isFullscreen())
   })
@@ -58,7 +62,25 @@ scene('main', () => {
     scale(2),
     pos(width()/2, height()/6),
     origin('center'),
-    color(255, 250, 113)  
+    color(255, 250, 113),
+    layer('ui'),
+  ])
+  
+  add([
+    sprite('screen1'),
+    scale(10),
+    pos(160, height()/2),
+    origin('center'),
+    layer('bg'),
+    floating(),
+  ])
+  add([
+    sprite('screen2'),
+    scale(10),
+    pos(width() - 160, height()/2),
+    origin('center'),
+    layer('bg'),
+    floating(),
   ])
 
   let p = add([
@@ -73,7 +95,8 @@ scene('main', () => {
     pos(width()/2, height()/2),
     origin('center'),
     area(),
-    color(255, 250, 113)
+    color(255, 250, 113),
+    layer('ui'),
   ])
 
   p.onClick(() => go('choose'));
@@ -180,11 +203,28 @@ scene('choose', () => {
 })
 
 scene('play', (m) => {
+  const song = choose(['song1', 'song2']);
+  const music = play(song, {volume: 0.3, loop: true,})
+  let score = 0;
   const s = m.toLowerCase();
   const SPEED = Game.chars[s].vel;
+
+  const scoreLabel = add([
+    text(`${score}`, {letterSpacing: -6, size: 25 ,}),
+    pos(width() - 60, 20),
+    layer('ui'),
+    z(100),
+    origin('center'),
+    fixed(),
+  ])
+  scoreLabel.onUpdate(() => {
+    scoreLabel.text = score;
+  })
+
   onKeyPress('f', () => {
     fullscreen(!isFullscreen())
   })
+
   let mark = add([
     sprite('marks', {anim: `${s}Idle`}),
     pos(50, height()/2),
@@ -247,22 +287,33 @@ scene('play', (m) => {
   mark.onDeath(() => {
     addKaboom(mark.pos);
     mark.destroy();
+    wait(0.8, () => music.stop());
+    wait(0.8, () => go('game over', score));
   })
   on('death', 'enemy', (e) => {
-    addKaboom(e.pos);
+    addKaboom(e.pos, {scale: 0.8});
     e.destroy();
+    score++;
   })
 
-  let eTimer = 0
   onUpdate('enemy', (e) => {
     let speedY = 0;
-    eTimer += dt();
+    e.t += dt();
     if(e.is('wavy')){
       speedY = wave(-100, 100, time() * 1.5)
     }
-    if(eTimer >= 4){
-      wait(0.0000001, () => eTimer = 0)
-      spawnBullet(e.pos, 'hi', 'enemy', 'none')
+    if(e.is('triple')){
+      if(e.t >= 1.5){
+        wait(0.0000001, () => e.t = 0)
+        spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-200, 30))
+        spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-200, 0));
+        spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-200, -30));
+      }
+    }else {
+      if(e.t >= 1.75){
+        wait(0.0000001, () => e.t = 0)
+        spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-100, 0))
+      }
     }
     e.move(-100, speedY)
   })
@@ -270,11 +321,108 @@ scene('play', (m) => {
   let t = 0;
   onUpdate(() => {
     t += dt();
-    if(t >= 2){
+    if(t >= 1.5){
       spawnEnemy();
       wait(0.001, () => t = 0)
     }
   })
+})
+
+scene('game over', (s) => {
+  const newhs = s > Game.highscore ? true : false;
+  Game.highscore = s > Game.highscore ? s : Game.highscore;
+  const PHRASES = {low: ["HMM... THAT'S KINDA DISSAPOINTING BRO", "YEAP, EARTH IS LOST", "MY GRANDMA CAN DO MORE DUDE", "SORRY MARK"], mid: ["I THINK YOU CAN DO MORE", 'YEAH, ALIENS ARE COOLER THO', "IS THAT YOUR BEST?", "WE'RE GETTING READY NOW", "THAT'S WHAT I WAS TALKING ABOUT"], high: ["MARK IS SO PROUD OF YOU", "MARK SAYS YOU'RE COOL", "BE AFRAID ALIENS", "YOU SHALL NOT PASS", "AWESOME DUDE"]}
+  let c;
+  let l;
+  if(s < 25){
+    l = 'low';
+    c = rgb(255, 0, 64)
+  }else if(s >= 25 && s <= 50){
+    l = 'mid';
+    c = rgb(0, 139, 180)
+  }else if(s > 50){
+    l = 'high'
+    c = rgb(0, 255, 173)
+  }
+  const p = choose(PHRASES[l]);
+  add([
+    text('GAME OVER', {
+      letterSpacing: -6,
+      transform: (idx, chr) => ({
+        angle: wave(-9, 9, time() * 3 + idx),
+      })
+    }),
+    scale(2),
+    pos(width()/2, height()/6),
+    origin('center'),
+    color(255, 64, 64),
+  ])
+  let score = add([
+    text('YOUR SCORE: ' + s, {
+      letterSpacing: -6,
+    }),
+    scale(1.5),
+    pos(width()/2, height()/4),
+    origin('right'),
+    // color(255, 64, 64),
+  ])
+  let highscore = add([
+    text('YOUR HIGHSCORE: ' + Game.highscore, {
+      letterSpacing: -6,
+    }),
+    scale(1.5),
+    pos(width()/2, height()/2),
+    origin('center'),
+    color(255, 230, 105),
+  ])
+  if(newhs){
+    add([
+      text('NEW HIGHSCORE', {
+        letterSpacing: -2,
+        size: 10,
+        transform: (idx, ch) => ({
+          color: hsl2rgb(wave(0, 1, time() * 1.5 + idx), wave(0.5, 1, time() * 3 + idx), wave(0.5, 0.8, time() * 2 + idx)),
+          pos: vec2(0, wave(-3, 3, time() * 1.2 + idx))
+        })
+      }),
+      scale(1.5),
+      pos(highscore.pos.x - 100, highscore.pos.y - 30),
+      origin('center'),
+      // color(155, 230, 105),
+    ])
+  }
+  let phrase = add([
+    text(p, {
+      letterSpacing: -2,
+      size: 18,
+      width: width() - 50
+    }),
+    // scale(1.5),
+    pos(width()/2, height()/3),
+    origin('center'),
+    color(c),
+  ])
+
+  onKeyPress('enter', () => go('main'));
+  let m = add([
+    text('MAIN MENU', {
+      letterSpacing: -6,
+      size: 40,
+      transform: (idx, ch) => ({
+        angle: wave(-9, 9, time() * 3 + idx),
+        pos: vec2(0, wave(-2, 2, time() * 3 + idx * 0.5)),
+      })
+    }),
+    pos(width() - 200, height() - 50),
+    origin('center'),
+    area(),
+    // color(96, 250, 113),
+  ])
+
+  m.onClick(() => {
+    go('main')
+  })
+
 })
 
 go('main')

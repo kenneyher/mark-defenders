@@ -1,4 +1,4 @@
-function spawnBullet(p, f, obj, opts){
+function spawnBullet(p, f, obj, opts, vel){
   if(obj == 'player'){
     if(opts.toLowerCase() == 'none'){
       add([
@@ -40,7 +40,7 @@ function spawnBullet(p, f, obj, opts){
       pos(p),
       origin('center'),
       cleanup(),
-      move(LEFT, 350),
+      move(vel, 350),
       area(),
       "dangerous",
     ])
