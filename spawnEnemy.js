@@ -7,10 +7,11 @@ function spawnEnemy(){
       area({scale: 0.8}),
       scale(2),
       pos(width() - 20, rand(50, height() - 50)),
-      health(5),
+      health(4),
       "enemy",
       {
         t: 0,
+        speed: 120,
       }
     ])
   }else if(type == 'wavy'){
@@ -20,11 +21,12 @@ function spawnEnemy(){
       area({scale: 0.8}),
       scale(2),
       pos(width() - 20, rand(100, height() - 100)),
-      health(5),
+      health(4),
       "enemy",
       'wavy',
       {
         t: 0,
+        speed: 120,
       }
     ])
   }else if(type == 'triple'){
@@ -34,11 +36,12 @@ function spawnEnemy(){
       area({scale: 0.8}),
       scale(2),
       pos(width() - 20, rand(50, height() - 50)),
-      health(8),
+      health(7),
       "enemy",
       "triple",
       {
         t: 0,
+        speed: 70
       }
     ])
   }

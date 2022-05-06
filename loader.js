@@ -46,6 +46,12 @@ function loader(){
 
   loadSound('song1', 'assets/sounds/among-the-stars.mp3');
   loadSound('song2', 'assets/sounds/far-out.mp3');
+  loadSound('song3', 'assets/sounds/wormhole-ahead.mp3');
+  loadSound('main-screen', 'assets/sounds/defenders.mp3');
+  loadSound('death', 'assets/sounds/death.wav');
+  loadSound('hurt', 'assets/sounds/hurt.wav');
+  loadSound('ka-boom', 'assets/sounds/ka-boom.wav');
+  loadSound('shoot', 'assets/sounds/shoot.wav');
 }
 
 export default loader;

@@ -48,6 +48,7 @@ const Game = {
 }
 
 scene('main', () => {
+  const MAIN_MUSIC = play('main-screen', {volume: 0.35, loop: true});
   layers(Game.layers);
   onKeyPress('f', () => {
     fullscreen(!isFullscreen())
@@ -99,10 +100,10 @@ scene('main', () => {
     layer('ui'),
   ])
 
-  p.onClick(() => go('choose'));
+  p.onClick(() => go('choose', MAIN_MUSIC));
 })
 
-scene('choose', () => {
+scene('choose', (music) => {
   onKeyPress('f', () => {
     fullscreen(!isFullscreen())
   })
@@ -196,14 +197,30 @@ scene('choose', () => {
 
   p.onClick(() => {
     go('play', s[m.char])
+    music.stop();
   })
   onKeyPress('enter', () => {
     go('play', s[m.char])
+    music.stop();
   })
 })
 
 scene('play', (m) => {
-  const song = choose(['song1', 'song2']);
+  const wall1 = add([
+    rect(width(), 0),
+    opacity(0),
+    solid(),
+    area(),
+    pos(0, 0),
+  ])
+  const wall2 = add([
+    rect(width(), 10),
+    opacity(0),
+    solid(),
+    area(),
+    pos(0, height()),
+  ])
+  const song = choose(['song1', 'song2', 'song3']);
   const music = play(song, {volume: 0.3, loop: true,})
   let score = 0;
   const s = m.toLowerCase();
@@ -229,7 +246,7 @@ scene('play', (m) => {
     sprite('marks', {anim: `${s}Idle`}),
     pos(50, height()/2),
     scale(2),
-    area({scale: 0.8}),
+    area({scale: 0.6}),
     health(Game.chars[s].attributes.health),
     origin('center'),
     {
@@ -272,25 +289,32 @@ scene('play', (m) => {
 
   loop(0.4, () => {
     if(mark.exists()){
-      spawnBullet(mark.pos, Game.chars[s].bullet, 'player', Game.chars[s].attributes.special)
+      spawnBullet(mark.pos, Game.chars[s].bullet, 'player', Game.chars[s].attributes.special);
+      play('shoot', {volume: 0.05, speed: 8})
     }
   })
 
   onCollide('enemy', 'bullet', (e, b) => {
     b.destroy();
     e.hurt(Game.chars[s].attributes.atk);
+    // play('ka-boom', {volume: 0.35})
   })
   mark.onCollide('dangerous', (d) => {
     d.destroy();
+    shake();
     mark.hurt(1);
+    play('hurt', {volume: 0.2, speed: 1.5})
   })
   mark.onDeath(() => {
+    shake(200);
     addKaboom(mark.pos);
     mark.destroy();
+    play('ka-boom', {volume: 0.2})
     wait(0.8, () => music.stop());
     wait(0.8, () => go('game over', score));
   })
   on('death', 'enemy', (e) => {
+    play('ka-boom', {volume: 0.2, speed: 1.5})
     addKaboom(e.pos, {scale: 0.8});
     e.destroy();
     score++;
@@ -303,7 +327,7 @@ scene('play', (m) => {
       speedY = wave(-100, 100, time() * 1.5)
     }
     if(e.is('triple')){
-      if(e.t >= 1.5){
+      if(e.t >= 1.75){
         wait(0.0000001, () => e.t = 0)
         spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-200, 30))
         spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-200, 0));
@@ -315,11 +339,13 @@ scene('play', (m) => {
         spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-100, 0))
       }
     }
-    e.move(-100, speedY)
+    e.move(-e.speed, speedY)
   })
 
   let t = 0;
   onUpdate(() => {
+    mark.pushOut(wall1)
+    mark.pushOut(wall2)
     t += dt();
     if(t >= 1.5){
       spawnEnemy();
@@ -329,6 +355,7 @@ scene('play', (m) => {
 })
 
 scene('game over', (s) => {
+  play('death', {volume: 0.35, })
   const newhs = s > Game.highscore ? true : false;
   Game.highscore = s > Game.highscore ? s : Game.highscore;
   const PHRASES = {low: ["HMM... THAT'S KINDA DISSAPOINTING BRO", "YEAP, EARTH IS LOST", "MY GRANDMA CAN DO MORE DUDE", "SORRY MARK"], mid: ["I THINK YOU CAN DO MORE", 'YEAH, ALIENS ARE COOLER THO', "IS THAT YOUR BEST?", "WE'RE GETTING READY NOW", "THAT'S WHAT I WAS TALKING ABOUT"], high: ["MARK IS SO PROUD OF YOU", "MARK SAYS YOU'RE COOL", "BE AFRAID ALIENS", "YOU SHALL NOT PASS", "AWESOME DUDE"]}
