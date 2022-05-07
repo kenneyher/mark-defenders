@@ -1,8 +1,9 @@
-import kaboom from "./kaboom.mjs";
+import kaboom from "https://unpkg.com/kaboom/dist/kaboom.mjs";
 import loader from "./loader.js";
 import spawnBullet from "./spawnBullet.js";
 import spawnEnemy from "./spawnEnemy.js";
 import floating from "./floating.js";
+import stars from "./stars.js";
 
 const boomOpts = {
   width: 720,
@@ -40,7 +41,7 @@ const Game = {
       vel: 125,
     },
     "cyborg": {
-      attributes: {health: 2, atk: 3, speed: 'SLUGGISH', special: 'NONE'},
+      attributes: {health: 3, atk: 3, speed: 'SLUGGISH', special: 'NONE'},
       bullet: 3,
       vel: 100,
     }
@@ -48,6 +49,7 @@ const Game = {
 }
 
 scene('main', () => {
+  stars();
   const MAIN_MUSIC = play('main-screen', {volume: 0.35, loop: true});
   layers(Game.layers);
   onKeyPress('f', () => {
@@ -104,6 +106,7 @@ scene('main', () => {
 })
 
 scene('choose', (music) => {
+  stars();
   onKeyPress('f', () => {
     fullscreen(!isFullscreen())
   })
@@ -206,6 +209,7 @@ scene('choose', (music) => {
 })
 
 scene('play', (m) => {
+  layers(['bg', 'game', 'fx', 'ui']);
   const wall1 = add([
     rect(width(), 0),
     opacity(0),
@@ -225,7 +229,6 @@ scene('play', (m) => {
   let score = 0;
   const s = m.toLowerCase();
   const SPEED = Game.chars[s].vel;
-
   const scoreLabel = add([
     text(`${score}`, {letterSpacing: -6, size: 25 ,}),
     pos(width() - 60, 20),
@@ -249,6 +252,7 @@ scene('play', (m) => {
     area({scale: 0.6}),
     health(Game.chars[s].attributes.health),
     origin('center'),
+    layer('game'),
     {
       up: false,
       down: false,
@@ -256,6 +260,25 @@ scene('play', (m) => {
       s: false,
     }
   ])
+
+  add([
+    text('HEALTH:', {sie: 20}),
+    color(255, 250, 113),
+    layer('ui'),
+    z(10),
+    pos(width()/2 - 150, 20),
+  ])
+
+  for(let i=0; i<mark.hp(); i++){
+    add([
+      sprite('lilmark'),
+      scale(2),
+      pos(width()/2 + 40*i, 30),
+      z(10),
+      origin('center'),
+      'lil marks',
+    ])
+  }
 
   onKeyDown('up', () => {
     if(isKeyDown('w')){
@@ -285,9 +308,13 @@ scene('play', (m) => {
       mark.move(0, SPEED)
     }
   })
+
+  loop(0.2, () => {
+    stars();
+  })
   // onKeyDown('up')
 
-  loop(0.4, () => {
+  loop(0.3, () => {
     if(mark.exists()){
       spawnBullet(mark.pos, Game.chars[s].bullet, 'player', Game.chars[s].attributes.special);
       play('shoot', {volume: 0.05, speed: 8})
@@ -304,6 +331,10 @@ scene('play', (m) => {
     shake();
     mark.hurt(1);
     play('hurt', {volume: 0.2, speed: 1.5})
+  })
+  mark.onCollide('enemy', (e) => {
+    play('hurt', {volume: 0.2, speed: 1.5})
+    mark.setHP(0);
   })
   mark.onDeath(() => {
     shake(200);
@@ -350,6 +381,10 @@ scene('play', (m) => {
     if(t >= 1.5){
       spawnEnemy();
       wait(0.001, () => t = 0)
+    }
+
+    if(mark.hp() < get('lil marks').length){
+      get('lil marks')[0].destroy();
     }
   })
 })

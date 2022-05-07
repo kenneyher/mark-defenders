@@ -43,6 +43,7 @@ function loader(){
   })
   loadSprite('screen1', 'assets/sprites/screen1.png')
   loadSprite('screen2', 'assets/sprites/screen2.png')
+  loadSprite('lilmark', 'assets/sprites/lifes.png')
 
   loadSound('song1', 'assets/sounds/among-the-stars.mp3');
   loadSound('song2', 'assets/sounds/far-out.mp3');
