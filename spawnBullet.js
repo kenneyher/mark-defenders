@@ -2,7 +2,7 @@ function spawnBullet(p, f, obj, opts, vel){
   if(obj == 'player'){
     if(opts.toLowerCase() == 'none'){
       add([
-        sprite('bullets', {frame: f}),
+        sprite('bullets', {anim: f}),
         scale(2),
         pos(p),
         origin('center'),
@@ -13,7 +13,7 @@ function spawnBullet(p, f, obj, opts, vel){
       ])
     }else if(opts.toLowerCase() == 'two bullets'){
       add([
-        sprite('bullets', {frame: f}),
+        sprite('bullets', {anim: f}),
         scale(2),
         pos(p),
         area(),
@@ -23,13 +23,65 @@ function spawnBullet(p, f, obj, opts, vel){
         "bullet"
       ])
       add([
-        sprite('bullets', {frame: f}),
+        sprite('bullets', {anim: f}),
         scale(2),
         pos(p),
         area(),
         origin('center'),
         cleanup(),
         move(vec2(100, 30), 350),
+        "bullet"
+      ])
+    }else if(opts == 'THREE BULLETS'){
+      add([
+        sprite('bullets', {anim: f}),
+        scale(2),
+        pos(p),
+        area(),
+        origin('center'),
+        cleanup(),
+        move(vec2(100, -30), 350),
+        "bullet"
+      ])
+      add([
+        sprite('bullets', {anim: f}),
+        scale(2),
+        pos(p),
+        area(),
+        origin('center'),
+        cleanup(),
+        move(vec2(100, 0), 350),
+        "bullet"
+      ])
+      add([
+        sprite('bullets', {anim: f}),
+        scale(2),
+        pos(p),
+        area(),
+        origin('center'),
+        cleanup(),
+        move(vec2(100, 30), 350),
+        "bullet"
+      ])
+    }else if(opts == 'DOUBLE BULLETS'){
+      add([
+        sprite('bullets', {anim: f}),
+        scale(2),
+        pos(p.x, p.y + 10),
+        area(),
+        origin('center'),
+        cleanup(),
+        move(vec2(100, 0), 350),
+        "bullet"
+      ])
+      add([
+        sprite('bullets', {anim: f}),
+        scale(2),
+        pos(p.x, p.y - 10),
+        area(),
+        origin('center'),
+        cleanup(),
+        move(vec2(100, 0), 350),
         "bullet"
       ])
     }

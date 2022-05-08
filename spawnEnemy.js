@@ -1,5 +1,5 @@
 function spawnEnemy(){
-  let type = choose(['basic', 'wavy', 'triple']);
+  let type = choose(['basic', 'wavy', 'triple', 'double']);
   if(type == 'basic'){
     add([
       sprite('aliens', {anim: 'basic', flipX: true}),
@@ -11,7 +11,8 @@ function spawnEnemy(){
       "enemy",
       {
         t: 0,
-        speed: 120,
+        speed: -120,
+        speedY: 0,
       }
     ])
   }else if(type == 'wavy'){
@@ -26,7 +27,8 @@ function spawnEnemy(){
       'wavy',
       {
         t: 0,
-        speed: 120,
+        speed: -120,
+        speedY: 0,
       }
     ])
   }else if(type == 'triple'){
@@ -41,10 +43,29 @@ function spawnEnemy(){
       "triple",
       {
         t: 0,
-        speed: 70
+        speed: -70,
+        speedY: 0,
+      }
+    ])
+  }else if(type == 'double'){
+    add([
+      sprite('aliens', {anim: 'double', flipX: true}),
+      origin('center'),
+      area({scale: 0.8}),
+      scale(2),
+      pos(width() - 20, rand(50, height() - 50)),
+      health(7),
+      "enemy",
+      "double",
+      {
+        t: 0,
+        speed: -120,
+        speedY: 0,
       }
     ])
   }
+
+  // wait(rand(0.2, 0.8), () => spawnEnemy);
 }
 
 export default spawnEnemy;

@@ -25,26 +25,50 @@ const Game = {
     "mark":
     {
       attributes: {health: 3, atk: 1, speed: 'NORMAL', special: 'NONE'},
-      bullet: 0,
+      bullet: 'mark',
       vel: 200,
     },
     "blue":
     {
       attributes: {health: 5, atk: 1, speed: 'NORMAL', special: 'NONE'},
-      bullet: 1,
+      bullet: 'blue',
       vel: 200,
     },
     "angry":
     {
       attributes: {health: 2, atk: 2, speed: 'SLOW', special: 'TWO BULLETS'},
-      bullet: 2,
+      bullet: 'angry',
       vel: 125,
     },
     "cyborg": {
       attributes: {health: 3, atk: 3, speed: 'SLUGGISH', special: 'NONE'},
-      bullet: 3,
+      bullet: 'cyborg',
       vel: 100,
-    }
+    },
+    "markachu":
+    {
+      attributes: {health: 3, atk: 2, speed: 'NORMAL', special: 'NONE'},
+      bullet: 'markachu',
+      vel: 200,
+    },
+    "ironmark":
+    {
+      attributes: {health: 3, atk: 1, speed: 'FAST', special: 'DOUBLE BULLETS'},
+      bullet: 'ironmark',
+      vel: 250,
+    },
+    "notmark":
+    {
+      attributes: {health: 3, atk: 1, speed: 'NORMAL', special: 'THREE BULLETS'},
+      bullet: 'notmark',
+      vel: 200,
+    },
+    "bean":
+    {
+      attributes: {health: 5, atk: 2, speed: 'SLOW', special: 'NONE'},
+      bullet: 'bean',
+      vel: 125,
+    },
   }
 }
 
@@ -122,9 +146,9 @@ scene('choose', (music) => {
     origin('center'),
     color(255, 250, 113),
   ])
-  const NAMES = ['MARK', 'BLUE MARK', 'ANGRY MARK', 'CYBORG MARK'];
-  const INFO = ['oh hi mark.', 'hmm... you look like mark', 'just chill out mark', "oh no, are you looking for mark connors?"];
-  const s = ['mark', 'blue', 'angry', 'cyborg'];
+  const NAMES = ['MARK', 'BLUE MARK', 'ANGRY MARK', 'CYBORG MARK', 'MARKACHU', 'IRON MARK', 'NOT MARK', 'BEAN'];
+  const INFO = ['oh hi mark.', 'hmm... you look like mark', 'just chill out mark', "who knows if he came from the future or the past", 'welp, maybe we need a pokeball', 'he is part of a music band i think', 'you should be in click the mark, also, go and try it', "he's not mark but it'll work"];
+  const s = ['mark', 'blue', 'angry', 'cyborg', 'markachu', 'ironmark', 'notmark', 'bean'];
 
   let m = add([
     sprite('marks', {frame: 0}),
@@ -137,12 +161,12 @@ scene('choose', (music) => {
   ])
 
   onKeyPress('right', () => {
-    m.frame = m.frame == 6 ? 0 : m.frame + 2;
-    m.char = m.char == 3 ? 0 : m.char + 1;
+    m.frame = m.frame == 14 ? 0 : m.frame + 2;
+    m.char = m.char == 7 ? 0 : m.char + 1;
   })
   onKeyPress('left', () => {
-    m.frame = m.frame == 0 ? 6 : m.frame - 2;
-    m.char = m.char == 0 ? 3 : m.char - 1;
+    m.frame = m.frame == 0 ? 14 : m.frame - 2;
+    m.char = m.char == 0 ? 7 : m.char - 1;
   })
 
   let i = add([
@@ -317,7 +341,7 @@ scene('play', (m) => {
   loop(0.3, () => {
     if(mark.exists()){
       spawnBullet(mark.pos, Game.chars[s].bullet, 'player', Game.chars[s].attributes.special);
-      play('shoot', {volume: 0.05, speed: 8})
+      play('shoot', {volume: 0.05, speed: 6})
     }
   })
 
@@ -352,10 +376,18 @@ scene('play', (m) => {
   })
 
   onUpdate('enemy', (e) => {
-    let speedY = 0;
     e.t += dt();
     if(e.is('wavy')){
-      speedY = wave(-100, 100, time() * 1.5)
+      e.speedY = wave(-100, 100, time() * 1.5)
+    }
+    if(e.is('double')){
+      if(e.t >= 1.75){
+        wait(0.0000001, () => e.t = 0)
+        spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-200, 30));
+        spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-200, -30));
+      }
+      e.speedY = wave(-100, 100, time() * 1.5)
+      // debug.log(e.speedY);
     }
     if(e.is('triple')){
       if(e.t >= 1.75){
@@ -370,17 +402,27 @@ scene('play', (m) => {
         spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-100, 0))
       }
     }
-    e.move(-e.speed, speedY)
+    e.move(e.speed, e.speedY);
   })
 
+  spawnEnemy();
+
+  let l = 1.5;
   let t = 0;
   onUpdate(() => {
     mark.pushOut(wall1)
     mark.pushOut(wall2)
     t += dt();
-    if(t >= 1.5){
+    if(t >= l){
       spawnEnemy();
       wait(0.001, () => t = 0)
+    }
+
+    if(score > 25){
+      l = 1;
+    }
+    if(score > 50){
+      l = 0.8
     }
 
     if(mark.hp() < get('lil marks').length){

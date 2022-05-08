@@ -1,8 +1,8 @@
 function loader(){
   loadFont('kafont', 'assets/sprites/ka-font.png', 20, 20, {chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ.,?':1234567890",});
-  loadSprite('marks', 'assets/sprites/marksv1.png', {
+  loadSprite('marks', 'assets/sprites/marksv2.png', {
     sliceX: 2,
-    sliceY: 3.99,
+    sliceY: 8,
     anims: {
       markIdle: 0,
       markHit: 1,
@@ -12,6 +12,14 @@ function loader(){
       angryHit: 5,
       cyborgIdle: 6,
       cyborgHit: 7,
+      markachuIdle: 8,
+      markachuHit: 9,
+      ironmarkIdle: 10,
+      ironmarkHit: 11,
+      notmarkIdle: 12,
+      notmarkHit: 13,
+      beanIdle: 14,
+      beanHit: 15,
     }
   })
   loadSprite('boom', 'assets/sprites/boom.png', {
@@ -23,16 +31,27 @@ function loader(){
   })
   loadSprite('aliens', 'assets/sprites/enemies.png', {
     sliceX: 2,
-    sliceY: 3,
+    sliceY: 4,
     anims: {
       basic: {from: 0, to: 1, loop: true, speed: 7},
       wavy: {from: 2, to: 3, loop: true, speed: 7},
       triple: {from: 4, to: 5, loop: true, speed: 7},
+      double: {from: 6, to: 7, loop: true, speed: 7},
     }
   })
   loadSprite('bullets', 'assets/sprites/bullets.png', {
     sliceX: 4,
-    sliceY: 1,
+    sliceY: 4,
+    anims: {
+      mark: {from: 0, to: 1, loop: true, speed: 7},
+      blue: {from: 2, to: 3, loop: true, speed: 7},
+      angry: {from: 4, to: 5, loop: true, speed: 7},
+      cyborg: {from: 6, to: 7, loop: true, speed: 7},
+      markachu: {from: 8, to: 9, loop: true, speed: 7},
+      ironmark: {from: 10, to: 11, loop: true, speed: 7},
+      notmark: {from: 12, to: 13, loop: true, speed: 7},
+      bean: {from: 14, to: 15, loop: true, speed: 7},
+    }
   })
   loadSprite('e-bullet', 'assets/sprites/e-bullet.png', {
     sliceX: 2,
