@@ -8,7 +8,9 @@ function spawnEnemy(){
       scale(2),
       pos(width() - 20, rand(50, height() - 50)),
       health(4),
+      layer('game'),
       "enemy",
+      'basic',
       {
         t: 0,
         speed: -120,
@@ -23,6 +25,7 @@ function spawnEnemy(){
       scale(2),
       pos(width() - 20, rand(100, height() - 100)),
       health(4),
+      layer('game'),
       "enemy",
       'wavy',
       {
@@ -39,6 +42,7 @@ function spawnEnemy(){
       scale(2),
       pos(width() - 20, rand(50, height() - 50)),
       health(7),
+      layer('game'),
       "enemy",
       "triple",
       {
@@ -53,6 +57,7 @@ function spawnEnemy(){
       origin('center'),
       area({scale: 0.8}),
       scale(2),
+      layer('game'),
       pos(width() - 20, rand(50, height() - 50)),
       health(7),
       "enemy",

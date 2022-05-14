@@ -60,6 +60,13 @@ function loader(){
       idle: {from: 0, to: 1, loop: true, speed: 5}
     }
   })
+  loadSprite('boss', 'assets/sprites/boss1.png', {
+    sliceX: 2,
+    sliceY: 1,
+    anims: {
+      idle: {from: 0, to: 1, loop: true, speed: 5}
+    }
+  })
   loadSprite('screen1', 'assets/sprites/screen1.png')
   loadSprite('screen2', 'assets/sprites/screen2.png')
   loadSprite('lilmark', 'assets/sprites/lifes.png')
@@ -67,11 +74,12 @@ function loader(){
   loadSound('song1', 'assets/sounds/among-the-stars.mp3');
   loadSound('song2', 'assets/sounds/far-out.mp3');
   loadSound('song3', 'assets/sounds/wormhole-ahead.mp3');
-  loadSound('main-screen', 'assets/sounds/defenders.mp3');
+  loadSound('main-screen', 'assets/sounds/defenders.wav');
   loadSound('death', 'assets/sounds/death.wav');
   loadSound('hurt', 'assets/sounds/hurt.wav');
   loadSound('ka-boom', 'assets/sounds/ka-boom.wav');
   loadSound('shoot', 'assets/sounds/shoot.wav');
+  loadSound('boss', 'assets/sounds/lost-in-the-void.mp3');
 }
 
 export default loader;

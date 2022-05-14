@@ -110,8 +110,8 @@ scene('main', () => {
     floating(),
   ])
 
-  let p = add([
-    text('PLAY', {
+  let a = add([
+    text('ARCADE MODE', {
       letterSpacing: -6,
       size: 40,
       transform: (idx, chr) => ({
@@ -124,12 +124,36 @@ scene('main', () => {
     area(),
     color(255, 250, 113),
     layer('ui'),
+    {
+      s: 'arcade',
+    }
   ])
 
-  p.onClick(() => go('choose', MAIN_MUSIC));
+  let b = add([
+    text('BOSS FIGHT', {
+      letterSpacing: -6,
+      size: 40,
+      transform: (idx, chr) => ({
+        angle: wave(-9, 9, time() * 3 + idx),
+        pos: vec2(0, wave(-2, 2, time() * 3 + idx)),
+      })
+    }),
+    pos(width()/2, height()/1.5),
+    origin('center'),
+    area(),
+    color(255, 250, 113),
+    layer('ui'),
+    {
+      s: 'boss',
+    }
+  ])
+
+
+  a.onClick(() => go('choose', MAIN_MUSIC, a.s));
+  b.onClick(() => go('choose', MAIN_MUSIC, b.s));
 })
 
-scene('choose', (music) => {
+scene('choose', (music, mode) => {
   stars();
   onKeyPress('f', () => {
     fullscreen(!isFullscreen())
@@ -223,16 +247,16 @@ scene('choose', (music) => {
   ])
 
   p.onClick(() => {
-    go('play', s[m.char])
+    go('play', s[m.char], mode)
     music.stop();
   })
   onKeyPress('enter', () => {
-    go('play', s[m.char])
+    go('play', s[m.char], mode)
     music.stop();
   })
 })
 
-scene('play', (m) => {
+scene('play', (m, mode) => {
   layers(['bg', 'game', 'fx', 'ui']);
   const wall1 = add([
     rect(width(), 0),
@@ -249,7 +273,7 @@ scene('play', (m) => {
     pos(0, height()),
   ])
   const song = choose(['song1', 'song2', 'song3']);
-  const music = play(song, {volume: 0.3, loop: true,})
+  const music = play(mode == 'boss' ? 'boss' : song, {volume: 0.3, loop: true,})
   let score = 0;
   const s = m.toLowerCase();
   const SPEED = Game.chars[s].vel;
@@ -293,12 +317,82 @@ scene('play', (m) => {
     pos(width()/2 - 150, 20),
   ])
 
+  if(mode == 'boss'){
+    const b = add([
+      sprite('boss', {anim: 'idle'}),
+      scale(6),
+      pos(width() - 100, height()/2),
+      origin('center'),
+      layer('game'),
+      health(500),
+      floating(),
+      area({width: 20 , height: 15, offset: vec2(0, -35)}),
+      "boss",
+      {
+        t: 0,
+        atk1: 'seven',
+        atk2: 'rand',
+        atk3: 'bubbles',
+      }
+    ])
+    b.onUpdate(() => {
+      b.t += dt();
+      if(b.t > 2.5){
+        spawnBullet(b.pos, 'hi', 'boss', choose([b.atk1, b.atk2, b.atk3]))
+        wait(0.01, () => b.t = 0)
+      }
+    })
+    b.onCollide('bullet', (d) => {
+      b.hurt(Game.chars[s].attributes.atk); 
+      d.destroy();
+      healthbar.set(b.hp());
+    })
+    b.onDeath(() => {
+      b.destroy();
+      // score = 100;
+      addKaboom(randi(width() - 150, width()), randi(height()/2 - 100, height()/2 + 100));
+      wait(0.05, () => addKaboom(vec2(randi(width() - 200, width()), randi(height()/2 - 100, height()/2 + 100)), {scale: randi(0.5, 1.5)}));
+      wait(0.12, () => addKaboom(vec2(randi(width() - 200, width()), randi(height()/2 - 100, height()/2 + 100)), {scale: randi(0.5, 1.5)}));
+      wait(0.2, () => addKaboom(vec2(randi(width() - 200, width()), randi(height()/2 - 100, height()/2 + 100)), {scale: randi(0.5, 1.5)}));
+      wait(0.5, () => addKaboom(vec2(randi(width() - 200, width()), randi(height()/2 - 100, height()/2 + 100)), {scale: randi(0.5, 1.5)}));
+      wait(0.05, () => play('ka-boom', {volume: 0.2}));
+      wait(0.12, () => play('ka-boom', {volume: 0.2}));
+      wait(0.2, () => play('ka-boom', {volume: 0.2}));
+      wait(0.5, () => play('ka-boom', {volume: 0.2}));
+      wait(0.8, () => music.stop());
+      wait(0.8, () => go('win'));
+    })
+    const healthbar = add([
+      rect(width(), 24),
+      pos(0, 0),
+      color(255, 59, 101),
+      fixed(),
+      {
+        max: 500,
+        set(hp) {
+          this.width = width() * b.hp() / this.max
+          this.flash = true
+        },
+      },
+    ])
+  
+    healthbar.onUpdate(() => {
+      if (healthbar.flash) {
+        healthbar.color = rgb(255, 255, 255)
+        healthbar.flash = false
+      } else {
+        healthbar.color = rgb(255, 59, 101)
+      }
+    })
+  }
+
   for(let i=0; i<mark.hp(); i++){
     add([
       sprite('lilmark'),
       scale(2),
       pos(width()/2 + 40*i, 30),
       z(10),
+      layer('ui'),
       origin('center'),
       'lil marks',
     ])
@@ -352,9 +446,11 @@ scene('play', (m) => {
   })
   mark.onCollide('dangerous', (d) => {
     d.destroy();
+    mark.play(`${s}Hit`);
     shake();
     mark.hurt(1);
-    play('hurt', {volume: 0.2, speed: 1.5})
+    wait(0.4, () => mark.play(`${s}Idle`))
+    play('hurt', {volume: 0.2, speed: 1.5});
   })
   mark.onCollide('enemy', (e) => {
     play('hurt', {volume: 0.2, speed: 1.5})
@@ -379,6 +475,10 @@ scene('play', (m) => {
     e.t += dt();
     if(e.is('wavy')){
       e.speedY = wave(-100, 100, time() * 1.5)
+      if(e.t >= 1.75){
+        wait(0.0000001, () => e.t = 0)
+        spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-100, 0))
+      }
     }
     if(e.is('double')){
       if(e.t >= 1.75){
@@ -387,7 +487,6 @@ scene('play', (m) => {
         spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-200, -30));
       }
       e.speedY = wave(-100, 100, time() * 1.5)
-      // debug.log(e.speedY);
     }
     if(e.is('triple')){
       if(e.t >= 1.75){
@@ -396,7 +495,8 @@ scene('play', (m) => {
         spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-200, 0));
         spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-200, -30));
       }
-    }else {
+    }
+    if(e.is('basic')) {
       if(e.t >= 1.75){
         wait(0.0000001, () => e.t = 0)
         spawnBullet(e.pos, 'hi', 'enemy', 'none', vec2(-100, 0))
@@ -527,6 +627,39 @@ scene('game over', (s) => {
     go('main')
   })
 
+})
+
+scene('win', () => {
+  add([
+    text('EXCELLENT JOB HUMAN. NOW, THE EARTH IS SAVED FROM THAT MONSTER THANKS TO MARK, AND YOUR LITTLE HELP. BUT THE INVASION IS STILL HAPPENING. GO, HERO, AND SAVE THE WORLD.',
+      {
+        letterSpacing: -2,
+        size: 20,
+        width: width() - 50,
+      }
+    ),
+    pos(width()/2, height()/2),
+    origin('center'),
+    color(255, 84, 101),
+    "msg",
+  ])
+  add([
+    text('PRESS ENTER TO RETURN',
+      {
+        letterSpacing: -2,
+        size: 20,
+        width: width() - 50,
+        transform: (idx, ch) => ({
+          pos: vec2(0, wave(-5, 5, time() * 1.5 + idx))
+        })
+      }
+    ),
+    pos(width()/2 + 120, height()/1.2),
+    origin('center'),
+  ])
+  onKeyPress('enter', () => {
+    go('main')
+  })
 })
 
 go('main')
