@@ -69,6 +69,18 @@ const Game = {
       bullet: 'bean',
       vel: 125,
     },
+    "ninja":
+    {
+      attributes: {health: 3, atk: 2, speed: 'FAST', special: 'NONE'},
+      bullet: 'ninja',
+      vel: 250,
+    },
+    "shadow":
+    {
+      attributes: {health: 1, atk: 3, speed: 'SLOW', special: 'THREE BULLETS'},
+      bullet: 'shadow',
+      vel: 150,
+    },
   }
 }
 
@@ -170,9 +182,9 @@ scene('choose', (music, mode) => {
     origin('center'),
     color(255, 250, 113),
   ])
-  const NAMES = ['MARK', 'BLUE MARK', 'ANGRY MARK', 'CYBORG MARK', 'MARKACHU', 'IRON MARK', 'NOT MARK', 'BEAN'];
-  const INFO = ['oh hi mark.', 'hmm... you look like mark', 'just chill out mark', "who knows if he came from the future or the past", 'welp, maybe we need a pokeball', 'he is part of a music band i think', 'you should be in click the mark, also, go and try it', "he's not mark but it'll work"];
-  const s = ['mark', 'blue', 'angry', 'cyborg', 'markachu', 'ironmark', 'notmark', 'bean'];
+  const NAMES = ['MARK', 'BLUE MARK', 'ANGRY MARK', 'CYBORG MARK', 'MARKACHU', 'IRON MARK', 'NOT MARK', 'BEAN', 'NINJA MARK', 'SHADOW MARK'];
+  const INFO = ['oh hi mark.', 'hmm... you look like mark', 'just chill out mark', "who knows if he came from the future or the past", 'welp, maybe we need a pokeball', 'he is part of a music band i think', 'you should be in click the mark, also, go and try it', "he's not mark but it'll work", "he came from somewhere called outworld", "we don't know what it is or where it came from, we just know he's dangerous"];
+  const s = ['mark', 'blue', 'angry', 'cyborg', 'markachu', 'ironmark', 'notmark', 'bean', 'ninja', 'shadow'];
 
   let m = add([
     sprite('marks', {frame: 0}),
@@ -185,12 +197,12 @@ scene('choose', (music, mode) => {
   ])
 
   onKeyPress('right', () => {
-    m.frame = m.frame == 14 ? 0 : m.frame + 2;
-    m.char = m.char == 7 ? 0 : m.char + 1;
+    m.frame = m.frame == 18 ? 0 : m.frame + 2;
+    m.char = m.char == 9 ? 0 : m.char + 1;
   })
   onKeyPress('left', () => {
-    m.frame = m.frame == 0 ? 14 : m.frame - 2;
-    m.char = m.char == 0 ? 7 : m.char - 1;
+    m.frame = m.frame == 0 ? 18 : m.frame - 2;
+    m.char = m.char == 0 ? 9 : m.char - 1;
   })
 
   let i = add([
@@ -256,7 +268,7 @@ scene('choose', (music, mode) => {
   })
 })
 
-scene('play', (m, mode) => {
+scene('play', (s, mode) => {
   layers(['bg', 'game', 'fx', 'ui']);
   const wall1 = add([
     rect(width(), 0),
@@ -275,7 +287,7 @@ scene('play', (m, mode) => {
   const song = choose(['song1', 'song2', 'song3']);
   const music = play(mode == 'boss' ? 'boss' : song, {volume: 0.3, loop: true,})
   let score = 0;
-  const s = m.toLowerCase();
+  // const s = m.toLowerCase();
   const SPEED = Game.chars[s].vel;
   const scoreLabel = add([
     text(`${score}`, {letterSpacing: -6, size: 25 ,}),
@@ -434,6 +446,7 @@ scene('play', (m, mode) => {
 
   loop(0.3, () => {
     if(mark.exists()){
+      // debug.log(Game.chars[s].bullet);
       spawnBullet(mark.pos, Game.chars[s].bullet, 'player', Game.chars[s].attributes.special);
       play('shoot', {volume: 0.05, speed: 6})
     }
