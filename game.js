@@ -81,6 +81,12 @@ const Game = {
       bullet: 'shadow',
       vel: 150,
     },
+    "cowboy":
+    {
+      attributes: {health: 3, atk: 3, speed: 'SLOW', special: 'NONE'},
+      bullet: 'cowboy',
+      vel: 150,
+    },
   }
 }
 
@@ -182,9 +188,9 @@ scene('choose', (music, mode) => {
     origin('center'),
     color(255, 250, 113),
   ])
-  const NAMES = ['MARK', 'BLUE MARK', 'ANGRY MARK', 'CYBORG MARK', 'MARKACHU', 'IRON MARK', 'NOT MARK', 'BEAN', 'NINJA MARK', 'SHADOW MARK'];
-  const INFO = ['oh hi mark.', 'hmm... you look like mark', 'just chill out mark', "who knows if he came from the future or the past", 'welp, maybe we need a pokeball', 'he is part of a music band i think', 'you should be in click the mark, also, go and try it', "he's not mark but it'll work", "he came from somewhere called outworld", "we don't know what it is or where it came from, we just know he's dangerous"];
-  const s = ['mark', 'blue', 'angry', 'cyborg', 'markachu', 'ironmark', 'notmark', 'bean', 'ninja', 'shadow'];
+  const NAMES = ['MARK', 'SAD MARK', 'ANGRY MARK', 'CYBORG MARK', 'MARKACHU', 'IRON MARK', 'NOT MARK', 'BEAN', 'NINJA MARK', 'SHADOW MARK'];
+  const INFO = ['oh hi mark.', 'he just cries and cries...', 'just chill out mark', "who knows if he came from the future or the past", 'welp, maybe we need a pokeball', 'he is part of a music band i think', 'you should be in click the mark, also, go and try it', "he's not mark but it'll work", "he came from somewhere called outworld", "we don't know what it is or where it came from, we just know he's dangerous", 'he never fails'];
+  const s = ['mark', 'blue', 'angry', 'cyborg', 'markachu', 'ironmark', 'notmark', 'bean', 'ninja', 'shadow', 'cowboy'];
 
   let m = add([
     sprite('marks', {frame: 0}),
@@ -197,12 +203,12 @@ scene('choose', (music, mode) => {
   ])
 
   onKeyPress('right', () => {
-    m.frame = m.frame == 18 ? 0 : m.frame + 2;
-    m.char = m.char == 9 ? 0 : m.char + 1;
+    m.frame = m.frame == 30 ? 0 : m.frame + 3;
+    m.char = m.char == 10 ? 0 : m.char + 1;
   })
   onKeyPress('left', () => {
-    m.frame = m.frame == 0 ? 18 : m.frame - 2;
-    m.char = m.char == 0 ? 9 : m.char - 1;
+    m.frame = m.frame == 0 ? 30 : m.frame - 3;
+    m.char = m.char == 0 ? 10 : m.char - 1;
   })
 
   let i = add([
@@ -336,7 +342,7 @@ scene('play', (s, mode) => {
       pos(width() - 100, height()/2),
       origin('center'),
       layer('game'),
-      health(500),
+      health(400),
       floating(),
       area({width: 20 , height: 15, offset: vec2(0, -35)}),
       "boss",
@@ -380,7 +386,7 @@ scene('play', (s, mode) => {
       color(255, 59, 101),
       fixed(),
       {
-        max: 500,
+        max: 400,
         set(hp) {
           this.width = width() * b.hp() / this.max
           this.flash = true

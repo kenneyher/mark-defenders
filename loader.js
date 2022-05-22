@@ -1,29 +1,31 @@
 function loader(){
   loadFont('kafont', 'assets/sprites/ka-font.png', 20, 20, {chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ.,?':1234567890",});
-  loadSprite('marks', 'assets/sprites/marksv3.png', {
-    sliceX: 2,
-    sliceY: 10,
+  loadSprite('marks', 'assets/sprites/marksv4.png', {
+    sliceX: 3,
+    sliceY: 11,
     anims: {
-      markIdle: 0,
-      markHit: 1,
-      blueIdle: 2,
-      blueHit: 3,
-      angryIdle: 4,
-      angryHit: 5,
-      cyborgIdle: 6,
-      cyborgHit: 7,
-      markachuIdle: 8,
-      markachuHit: 9,
-      ironmarkIdle: 10,
-      ironmarkHit: 11,
-      notmarkIdle: 12,
-      notmarkHit: 13,
-      beanIdle: 14,
-      beanHit: 15,
-      ninjaIdle: 16,
-      ninjaHit: 17,
-      shadowIdle: 18,
-      shadowHit: 19,
+      markIdle: {from: 0, to: 1, loop: true, speed: 6},
+      markHit: 2,
+      blueIdle: {from: 3, to: 4, loop: true, speed: 6},
+      blueHit: 5,
+      angryIdle: {from: 6, to: 7, loop: true, speed: 6},
+      angryHit: 8,
+      cyborgIdle: {from: 9, to: 10, loop: true, speed: 6},
+      cyborgHit: 11,
+      markachuIdle: {from: 12, to: 13, loop: true, speed: 6},
+      markachuHit: 14,
+      ironmarkIdle: {from: 15, to: 16, loop: true, speed: 6},
+      ironmarkHit: 17,
+      notmarkIdle: {from: 18, to: 19, loop: true,speed: 6},
+      notmarkHit: 20,
+      beanIdle: {from: 21, to: 22, loop: true, speed: 6},
+      beanHit: 23,
+      ninjaIdle: {from: 24, to: 25, loop: true, speed: 6},
+      ninjaHit: 26,
+      shadowIdle: {from: 27, to: 28, loop: true, speed: 6},
+      shadowHit: 29,
+      cowboyIdle: {from: 30, to: 31, loop: true, speed: 6},
+      cowboyHit: 32,
     }
   })
   loadSprite('boom', 'assets/sprites/boom.png', {
@@ -44,19 +46,20 @@ function loader(){
     }
   })
   loadSprite('bullets', 'assets/sprites/bullets.png', {
-    sliceX: 4,
-    sliceY: 5,
+    sliceX: 6,
+    sliceY: 6,
     anims: {
-      mark: {from: 0, to: 1, loop: true, speed: 7},
-      blue: {from: 2, to: 3, loop: true, speed: 7},
-      angry: {from: 4, to: 5, loop: true, speed: 7},
-      cyborg: {from: 6, to: 7, loop: true, speed: 7},
-      markachu: {from: 8, to: 9, loop: true, speed: 7},
-      ironmark: {from: 10, to: 11, loop: true, speed: 7},
-      notmark: {from: 12, to: 13, loop: true, speed: 7},
-      bean: {from: 14, to: 15, loop: true, speed: 7},
-      ninja: {from: 16, to:  17, loop: true, speed: 7},
-      shadow: {from: 18, to: 19, loop: true, speed: 7},
+      mark: {from: 0, to: 2, loop: true, speed: 7},
+      blue: {from: 3, to: 5, loop: true, speed: 7},
+      angry: {from: 6, to: 8, loop: true, speed: 7},
+      cyborg: {from: 9, to: 11, loop: true, speed: 7},
+      markachu: {from: 12, to: 14, loop: true, speed: 7},
+      ironmark: {from: 15, to: 17, loop: true, speed: 7},
+      notmark: {from: 18, to: 20, loop: true, speed: 7},
+      bean: {from: 21, to: 23, loop: true, speed: 7},
+      ninja: {from: 24, to:  26, loop: true, speed: 7},
+      shadow: {from: 27, to: 29, loop: true, speed: 7},
+      cowboy: {from: 30, to: 32, loop: true, speed: 7},
     }
   })
   loadSprite('e-bullet', 'assets/sprites/e-bullet.png', {
@@ -77,9 +80,9 @@ function loader(){
   loadSprite('screen2', 'assets/sprites/screen2.png')
   loadSprite('lilmark', 'assets/sprites/lifes.png')
 
-  loadSound('song1', 'assets/sounds/among-the-stars.mp3');
+  loadSound('song1', 'assets/sounds/lost-in-space.wav');
   loadSound('song2', 'assets/sounds/far-out.mp3');
-  loadSound('song3', 'assets/sounds/wormhole-ahead.mp3');
+  loadSound('song3', 'assets/sounds/wormhole-ahead.wav');
   loadSound('main-screen', 'assets/sounds/defenders.wav');
   loadSound('death', 'assets/sounds/death.wav');
   loadSound('hurt', 'assets/sounds/hurt.wav');
