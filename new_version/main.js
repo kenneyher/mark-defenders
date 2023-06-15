@@ -9,8 +9,8 @@ kaboom({
   global: true,
 })
 
-loadSprite("construction", "../assets/sprites/construction_ahead.png");
-loadFont("sink", "../assets/kitchen_sink.ttf");
+loadSprite("construction", "/assets/sprites/construction_ahead.png");
+loadFont("sink", "/assets/kitchen_sink.ttf");
 
 scene("default", () => {
   add([
