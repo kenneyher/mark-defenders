@@ -1,4 +1,4 @@
-import kaboom from "https://unpkg.com/kaboom/dist/kaboom.mjs";
+import kaboom from "https://unpkg.com/kaboom@3000.0.1/dist/kaboom.mjs";
 import loader from "./loader.js";
 import spawnBullet from "./spawnBullet.js";
 import spawnEnemy from "./spawnEnemy.js";
@@ -6,8 +6,8 @@ import floating from "./floating.js";
 import stars from "./stars.js";
 
 const boomOpts = {
-  width: 720,
-  height: 400,
+  width: window.innerWidth,
+  height: window.innerHeight,
   canvas: document.getElementById('kaboom'),
   crisp: true,
   background: [0,0,0],
@@ -87,7 +87,8 @@ const Game = {
       bullet: 'cowboy',
       vel: 150,
     },
-  }
+  },
+  charsSize: 20,
 }
 
 scene('main', () => {
@@ -113,7 +114,7 @@ scene('main', () => {
   
   add([
     sprite('screen1'),
-    scale(10),
+    scale(Game.charsSize),
     pos(160, height()/2),
     origin('center'),
     layer('bg'),
@@ -121,7 +122,7 @@ scene('main', () => {
   ])
   add([
     sprite('screen2'),
-    scale(10),
+    scale(Game.charsSize),
     pos(width() - 160, height()/2),
     origin('center'),
     layer('bg'),
@@ -183,19 +184,19 @@ scene('choose', (music, mode) => {
         pos: vec2(0, wave(-3, 3, time() * 3 + idx)),
       })
     }),
-    scale(2),
+    scale(6),
     pos(width()/2, height()/7),
     origin('center'),
     color(255, 250, 113),
   ])
-  const NAMES = ['MARK', 'SAD MARK', 'ANGRY MARK', 'CYBORG MARK', 'MARKACHU', 'IRON MARK', 'NOT MARK', 'BEAN', 'NINJA MARK', 'SHADOW MARK'];
+  const NAMES = ['MARK', 'SAD MARK', 'ANGRY MARK', 'CYBORG MARK', 'MARKACHU', 'IRON MARK', 'NOT MARK', 'BEAN', 'NINJA MARK', 'SHADOW MARK', 'COWBOY MARK'];
   const INFO = ['oh hi mark.', 'he just cries and cries...', 'just chill out mark', "who knows if he came from the future or the past", 'welp, maybe we need a pokeball', 'he is part of a music band i think', 'you should be in click the mark, also, go and try it', "he's not mark but it'll work", "he came from somewhere called outworld", "we don't know what it is or where it came from, we just know he's dangerous", 'he never fails'];
   const s = ['mark', 'blue', 'angry', 'cyborg', 'markachu', 'ironmark', 'notmark', 'bean', 'ninja', 'shadow', 'cowboy'];
 
   let m = add([
     sprite('marks', {frame: 0}),
     pos(width()/2, height()/2.5),
-    scale(5),
+    scale(8),
     origin('center'), 
     {
       char: 0,
@@ -212,13 +213,13 @@ scene('choose', (music, mode) => {
   })
 
   let i = add([
-    text(INFO[m.char].toUpperCase(), {size: 20, width: width() - 50, letterSpacing: -6}),
+    text(INFO[m.char].toUpperCase(), {size: 40, width: width() - 50, letterSpacing: -6}),
     pos(width()/2, height()/1.5),
     origin('center'),
     color(255, 250, 113),
   ])
   let n = add([
-    text(NAMES[m.char], {size: 30, width: width() - 50, letterSpacing: -6}),
+    text(NAMES[m.char], {size: 40, width: width() - 50, letterSpacing: -6}),
     pos(width()/2, height()/1.7),
     origin('center'),
   ])
@@ -228,7 +229,7 @@ scene('choose', (music, mode) => {
           [SPEED: ${Game.chars[s[m.char]].attributes.speed}].blue
           [SPECIAL: ${Game.chars[s[m.char]].attributes.special}].yellow`,
           {
-            size: 20, width: width() - 50, 
+            size: 40, width: width() - 50, 
             letterSpacing: -6,
             styles: {
               "green": { color: rgb(147, 250, 113)},
@@ -252,13 +253,13 @@ scene('choose', (music, mode) => {
   let p = add([
     text('GO', {
       letterSpacing: -6,
-      size: 40,
+      size: 80,
       transform: (idx, ch) => ({
         angle: wave(-9, 9, time() * 3 + idx),
         pos: vec2(0, wave(-2, 2, time() * 3 + idx * 0.5)),
       })
     }),
-    pos(width() - 50, height() - 50),
+    pos(width() - 100, height() - 50),
     origin('center'),
     area(),
     color(96, 250, 113),
